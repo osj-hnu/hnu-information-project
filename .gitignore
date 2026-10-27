@@ -1,24 +1,63 @@
-# Compiled class file
+# Java / Maven build output
+/target/
 *.class
-
-# Log file
-*.log
-
-# BlueJ files
-*.ctxt
-
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
-
-# Package Files #
 *.jar
 *.war
-*.nar
 *.ear
-*.zip
-*.tar.gz
-*.rar
+!**/maven-wrapper.jar
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+# Local tools and verification artifacts
+/.tools/
+
+# Logs and JVM crash dumps
+*.log
 hs_err_pid*
 replay_pid*
+
+# Local environment and connection settings
+.env
+.env.*
+!.env.example
+!.env.*.example
+!.env.template
+/src/main/resources/application-local.properties
+/src/main/resources/application-local.yml
+/src/main/resources/application-local.yaml
+/src/main/resources/application-secrets.properties
+/src/main/resources/application-secrets.yml
+/src/main/resources/application-secrets.yaml
+/db/oracle/*.local.sql
+/config/application-local.properties
+/config/application-local.yml
+/config/application-local.yaml
+/config/application-secrets.properties
+/config/application-secrets.yml
+/config/application-secrets.yaml
+/secrets/
+
+# Private keys, Oracle wallets and credential stores
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+*.sso
+/db/oracle/wallet/
+
+# IDE-generated metadata (shared VS Code configuration stays trackable)
+.idea/
+*.iml
+.classpath
+.project
+.settings/
+
+# Editor temporary files
+*.swp
+*.swo
+*~
+
+# OS-generated metadata
+.DS_Store
+Thumbs.db
+Desktop.ini

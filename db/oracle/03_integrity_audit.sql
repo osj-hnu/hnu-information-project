@@ -1,0 +1,92 @@
+-- Read-only audits for cross-row rules that CHECK constraints cannot enforce.
+-- Review returned rows. Current-policy comparisons can also flag historical policy changes.
+-- These queries detect problems; they do not prevent concurrent invalid writes.
+SET DEFINE OFF
+
+PROMPT 1. Model/spec item must belong to the same equipment type
+SELECT ms.MODEL_ID, ms.SPEC_ITEM_ID, m.TYPE_ID AS MODEL_TYPE, s.TYPE_ID AS SPEC_TYPE
+FROM TBL_MODEL_SPEC ms
+JOIN TBL_EQUIPMENT_MODEL m ON m.MODEL_ID = ms.MODEL_ID
+JOIN TBL_SPEC_ITEM s ON s.SPEC_ITEM_ID = ms.SPEC_ITEM_ID
+WHERE m.TYPE_ID <> s.TYPE_ID;
+
+PROMPT 2. A facility request purpose must be allowed by that facility
+SELECT r.REQUEST_ITEM_ID, r.FACILITY_ID, r.PURPOSE_ID
+FROM TBL_REQUEST_ITEM r
+WHERE r.ITEM_KIND = 'F'
+  AND NOT EXISTS (
+      SELECT 1 FROM TBL_FACILITY_PURPOSE p
+      WHERE p.FACILITY_ID = r.FACILITY_ID AND p.PURPOSE_ID = r.PURPOSE_ID
+  );
+
+PROMPT 3. Cumulative returned quantity must not exceed delivered quantity
+SELECT c.CHECKOUT_ID, c.COMPONENT_SEQ, c.DELIVERED_QTY,
+       SUM(r.RETURNED_QTY) AS TOTAL_RETURNED_QTY
+FROM TBL_CHECKOUT_COMPONENT c
+JOIN TBL_RETURN_COMPONENT r
+  ON r.CHECKOUT_ID = c.CHECKOUT_ID AND r.COMPONENT_SEQ = c.COMPONENT_SEQ
+GROUP BY c.CHECKOUT_ID, c.COMPONENT_SEQ, c.DELIVERED_QTY
+HAVING SUM(r.RETURNED_QTY) > c.DELIVERED_QTY;
+
+PROMPT 4. Same-resource approved/used/completed planned periods must not overlap
+SELECT a.REQUEST_ITEM_ID AS ITEM_A, b.REQUEST_ITEM_ID AS ITEM_B, a.ITEM_KIND,
+       a.EQUIPMENT_ID, a.FACILITY_ID
+FROM TBL_REQUEST_ITEM a
+JOIN TBL_REQUEST_ITEM b
+  ON a.REQUEST_ITEM_ID < b.REQUEST_ITEM_ID
+ AND a.ITEM_KIND = b.ITEM_KIND
+ AND ((a.ITEM_KIND = 'E' AND a.EQUIPMENT_ID = b.EQUIPMENT_ID)
+   OR (a.ITEM_KIND = 'F' AND a.FACILITY_ID = b.FACILITY_ID))
+ AND a.USE_START_AT < b.USE_END_AT
+ AND a.USE_END_AT > b.USE_START_AT
+WHERE a.STATUS_CODE IN ('approved','collected','return_requested','return_held','returned')
+  AND b.STATUS_CODE IN ('approved','collected','return_requested','return_held','returned');
+
+PROMPT 5. Checkout must have a body component and at least one delivered unit
+SELECT co.CHECKOUT_ID
+FROM TBL_EQUIPMENT_CHECKOUT co
+WHERE NOT EXISTS (
+    SELECT 1 FROM TBL_CHECKOUT_COMPONENT c
+    WHERE c.CHECKOUT_ID = co.CHECKOUT_ID AND c.BODY_YN = 'Y'
+)
+OR NOT EXISTS (
+    SELECT 1 FROM TBL_CHECKOUT_COMPONENT c
+    WHERE c.CHECKOUT_ID = co.CHECKOUT_ID AND c.DELIVERED_QTY > 0
+);
+
+PROMPT 6. Normal checkout must deliver the fixed set intact
+SELECT co.CHECKOUT_ID, c.COMPONENT_SEQ, c.REQUIRED_QTY, c.DELIVERED_QTY, c.OUT_CONDITION
+FROM TBL_EQUIPMENT_CHECKOUT co
+JOIN TBL_CHECKOUT_COMPONENT c ON c.CHECKOUT_ID = co.CHECKOUT_ID
+WHERE co.SOURCE_CODE = 'NORMAL'
+  AND (c.DELIVERED_QTY <> c.REQUIRED_QTY OR c.OUT_CONDITION <> 'NORMAL');
+
+PROMPT 7. Completed return inspections must have all components returned as of that round
+SELECT i.CHECKOUT_ID, i.INSPECTION_ROUND, c.COMPONENT_SEQ, c.DELIVERED_QTY
+FROM TBL_RETURN_INSPECTION i
+JOIN TBL_CHECKOUT_COMPONENT c ON c.CHECKOUT_ID = i.CHECKOUT_ID
+WHERE i.OUTCOME_CODE = 'COMPLETE'
+  AND NVL((
+      SELECT SUM(r.RETURNED_QTY) FROM TBL_RETURN_COMPONENT r
+      WHERE r.CHECKOUT_ID = c.CHECKOUT_ID
+        AND r.COMPONENT_SEQ = c.COMPONENT_SEQ
+        AND r.INSPECTION_ROUND <= i.INSPECTION_ROUND
+  ), 0) <> c.DELIVERED_QTY;
+
+PROMPT 8. Latest status log must agree with current request item status
+SELECT r.REQUEST_ITEM_ID, r.STATUS_CODE, l.TO_STATUS
+FROM TBL_REQUEST_ITEM r
+LEFT JOIN (
+    SELECT REQUEST_ITEM_ID, TO_STATUS,
+           ROW_NUMBER() OVER (
+               PARTITION BY REQUEST_ITEM_ID ORDER BY CHANGED_AT DESC, STATUS_LOG_ID DESC
+           ) AS RN
+    FROM TBL_REQUEST_STATUS_LOG
+) l ON l.REQUEST_ITEM_ID = r.REQUEST_ITEM_ID AND l.RN = 1
+WHERE l.REQUEST_ITEM_ID IS NULL OR r.STATUS_CODE <> l.TO_STATUS;
+
+PROMPT 9. Related equipment check log item must reference the same equipment
+SELECT l.CHECK_LOG_ID, l.EQUIPMENT_ID, l.RELATED_ITEM_ID
+FROM TBL_EQUIPMENT_CHECK_LOG l
+JOIN TBL_REQUEST_ITEM r ON r.REQUEST_ITEM_ID = l.RELATED_ITEM_ID
+WHERE r.ITEM_KIND <> 'E' OR r.EQUIPMENT_ID <> l.EQUIPMENT_ID;

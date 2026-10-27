@@ -1,0 +1,5 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"><head th:replace="~{fragments/layout :: head('목적별 대여')}"></head><body><header th:replace="~{fragments/layout :: header}"></header>
+<main id="main" class="container secondary-page"><a class="back-link" th:href="@{/}">← 홈으로</a><h1>목적별 대여</h1><form class="catalog-search" method="get"><label for="purpose">어떤 활동을 준비하고 계신가요?</label><div class="search-input-row"><input id="purpose" name="activity" th:value="${activity}" maxlength="300" placeholder="활동 목적을 입력하세요"><button class="primary-button">확인</button></div></form>
+<section class="purpose-summary"><h2>입력한 활동</h2><p th:text="${#strings.isEmpty(activity) ? '아직 입력한 활동이 없습니다.' : activity}"></p><p class="notice">입력 내용은 유지됩니다. 목적·인원·일정에 따른 규칙 기반 추천은 후속 구현 대상입니다. 지금은 장비·시설 목록에서 필요한 항목을 직접 살펴볼 수 있습니다.</p><div class="browse-actions"><a class="primary-button" th:href="@{/equipment}">장비 살펴보기</a><a class="secondary-button" th:href="@{/facilities}">시설 살펴보기</a></div></section>
+</main><footer th:replace="~{fragments/layout :: footer}"></footer></body></html>

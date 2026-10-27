@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('홈')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: header}"></header>
+<main id="main">
+  <section class="hero section-padding" aria-labelledby="hero-title">
+    <div class="hero-copy"><span class="eyebrow">교내 시설·장비 이용을 한곳에서</span><h1 id="hero-title">하고 싶은 활동에 맞춰,<br>공간과 장비를 찾아보세요.</h1><p>필요한 것이 정해져 있다면 직접 찾고, 처음이라면 목적에 맞는 추천으로 시작하세요.</p></div>
+    <form class="purpose-search" th:action="@{/purpose}" method="get">
+      <label for="purpose">어떤 활동을 준비하고 계신가요?</label>
+      <div class="search-input-row"><img th:src="@{/assets/8adc4.svg}" alt=""><input id="purpose" name="activity" th:value="${activity}" placeholder="예: 팀 과제 인터뷰 영상을 촬영하고 싶어요" maxlength="300"><button class="primary-button" type="submit">목적에 맞게 추천받기</button></div>
+      <div class="keywords"><span>추천 키워드</span><div class="keyword-list"><button th:each="keyword : ${keywords}" type="button" class="keyword" th:attr="data-keyword=${keyword}" aria-pressed="false" th:text="${keyword}">인터뷰 촬영</button></div></div>
+    </form>
+  </section>
+  <section class="quick-section section-padding" aria-labelledby="quick-title"><div class="container"><h2 id="quick-title" class="small-title">필요한 것이 정해져 있나요?</h2><div class="quick-grid">
+    <a class="quick-card" th:href="@{/equipment}"><span class="quick-content"><span class="icon-box blue"><img th:src="@{/assets/ff97a.svg}" alt=""></span><span><strong>장비 대여</strong><span class="description">카메라 · 빔프로젝터 · 무선 마이크 등</span></span></span><img th:src="@{/assets/0272b.svg}" alt=""></a>
+    <a class="quick-card" th:href="@{/facilities}"><span class="quick-content"><span class="icon-box blue"><img th:src="@{/assets/8f64d.svg}" alt=""></span><span><strong>시설 대여</strong><span class="description">스터디룸·회의실</span></span></span><img th:src="@{/assets/0272b.svg}" alt=""></a>
+  </div></div></section>
+  <section class="purpose-banner-section section-padding"><div class="container"><a class="purpose-banner" data-purpose-link th:href="@{/purpose(activity=${activity})}"><div><h2>목적별 대여</h2><p>무엇을 준비할지 모르겠다면 활동을 설명하고 추천받으세요.</p></div><span aria-hidden="true">→</span></a></div></section>
+  <section class="recommendation-section section-padding" aria-labelledby="recommend-title"><div class="container"><div class="section-heading"><h2 id="recommend-title">이런 활동을 준비하고 있나요?</h2><p>활동 목적에 맞는 장비와 공간을 살펴보고, 필요한 항목을 각각 신청하세요.</p></div><div class="three-grid recommendation-grid">
+    <article class="recommendation-card"><span class="icon-box"><img th:src="@{/assets/054e2.svg}" alt=""></span><div><h3>인터뷰 촬영 시작하기</h3><p class="recommendation-description">카메라 세트 + 마이크 세트<br>영상과 음성을 함께 기록할 때 필요한 구성입니다.</p></div><p class="card-note">추천 구성은 예시입니다. 실제 재고와 이용 가능 여부를 확인한 뒤 신청하세요.</p><div class="card-divider"><img th:src="@{/assets/f70fa.svg}" alt=""></div><a class="card-link" th:href="@{/purpose(activity='인터뷰 촬영')}">구성 살펴보기<img th:src="@{/assets/8ad40.svg}" alt=""></a></article>
+    <article class="recommendation-card"><span class="icon-box"><img th:src="@{/assets/1eae3.svg}" alt=""></span><div><h3>발표 연습 준비하기</h3><p class="recommendation-description">회의실 + 필요 시 빔프로젝터<br>발표 공간을 확인하고, 비치 설비에 따라 필요한 장비를 선택하세요.</p></div><p class="card-note">추천 구성은 예시입니다. 실제 재고와 이용 가능 여부를 확인한 뒤 신청하세요.</p><div class="card-divider"><img th:src="@{/assets/f70fa.svg}" alt=""></div><a class="card-link" th:href="@{/purpose(activity='발표 연습')}">구성 살펴보기<img th:src="@{/assets/8ad40.svg}" alt=""></a></article>
+    <article class="recommendation-card"><span class="icon-box"><img th:src="@{/assets/b46a5.svg}" alt=""></span><div><h3>팀 회의 시작하기</h3><p class="recommendation-description">스터디룸·회의실<br>참여 인원과 이용 목적에 맞는 공간을 찾으세요.</p></div><p class="card-note">추천 구성은 예시입니다. 실제 재고와 이용 가능 여부를 확인한 뒤 신청하세요.</p><div class="card-divider"><img th:src="@{/assets/f70fa.svg}" alt=""></div><a class="card-link" th:href="@{/purpose(activity='팀 회의')}">구성 살펴보기<img th:src="@{/assets/8ad40.svg}" alt=""></a></article>
+  </div></div></section>
+  <section class="guide-section section-padding" aria-labelledby="guide-title"><div class="container"><div class="section-heading centered"><h2 id="guide-title">간단한 3단계 예약 절차</h2><p>신청부터 최종 예약 확정까지의 과정입니다.</p></div><ol class="three-grid steps">
+    <li><div class="step-number"><span>01</span><img th:src="@{/assets/79009.svg}" alt=""></div><h3>시설 및 장비 탐색</h3><p>목적별 추천 또는 개별 탐색을 통해 필요한 공간과 장비를 찾습니다.</p></li>
+    <li><div class="step-number"><span>02</span><img th:src="@{/assets/79009.svg}" alt=""></div><h3>조건 확인 및 개별 신청</h3><p>이용 규칙, 구비 품목을 확인하고 날짜와 시간에 맞춰 개별 신청을 작성합니다.</p></li>
+    <li><div class="step-number"><span>03</span></div><h3>관리자 승인 후 이용</h3><p>내 신청 현황에서 승인 결과를 확인한 뒤, 안내된 절차에 따라 이용합니다.</p></li>
+  </ol><aside class="notice"><img th:src="@{/assets/cb39c.svg}" alt=""><p>시설과 장비는 각각 신청합니다. 신청 시에는 승인 대기이며, 관리자 승인 후 예약이 확정됩니다.</p></aside></div></section>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body></html>

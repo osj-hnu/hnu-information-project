@@ -106,3 +106,20 @@ hnu-information-project/
 5. 구현·검증 결과에 따라 문서와 소스코드를 함께 업데이트합니다.
 
 **주의:** 화면 시연 구현과 최종 서버·DB 연동 완료는 구분합니다. 이 README의 기능 목록은 프로젝트 목표를 포함하며 전체 기능 구현 완료를 의미하지 않습니다.
+
+## 10. 로컬 화면 구현 실행
+
+Figma Make 홈 화면을 **Spring Boot 3.5.7 + Thymeleaf + HTML/CSS/JavaScript**로 옮긴 초기 구현이 추가되었습니다. JDK 17 이상과 Maven이 필요합니다.
+
+```powershell
+mvn test
+mvn spring-boot:run
+```
+
+브라우저에서 `http://localhost:8080`을 엽니다. 홈 화면, 추천 키워드 입력과 전달, 가상 장비·시설 목록 검색을 구현했습니다. 실제 인증·예약·목적별 추천 및 Oracle 연동은 아직 구현하지 않았습니다.
+
+로컬 도구 사용법과 상세 구현 범위는 [화면 구현 안내](docs/ui/implementation.md)를 참고하세요.
+
+Oracle DB 생성 SQL과 제약조건 검증 스크립트는 [DB 구축 안내](db/oracle/README.md)에 정리했습니다. 테이블은 `TBL_`, 시퀀스는 `SEQ_` 규칙을 사용하며 아직 실제 DB에 적용하지 않았습니다.
+
+DB 계정과 향후 API 키의 로컬 설정 방법은 [비밀정보 관리 안내](docs/local-credentials.md)를 참고하세요. 실제 값은 공유 설정·소스·SQL에 작성하지 않습니다.

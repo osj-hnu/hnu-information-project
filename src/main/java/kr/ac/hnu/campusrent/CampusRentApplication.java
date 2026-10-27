@@ -1,0 +1,11 @@
+package kr.ac.hnu.campusrent;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class CampusRentApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(CampusRentApplication.class, args);
+    }
+}

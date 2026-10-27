@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(title)">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title th:text="${title} + ' | CampusRent'">CampusRent</title>
+  <link rel="stylesheet" th:href="@{/css/campusrent.css}" href="/css/campusrent.css">
+  <script th:src="@{/js/home.js}" src="/js/home.js" defer></script>
+</head>
+<body>
+<header th:fragment="header" class="site-header">
+  <a class="skip-link" href="#main">본문으로 건너뛰기</a>
+  <div class="header-inner">
+    <a class="brand" th:href="@{/}" aria-label="CampusRent 메인"><span class="brand-mark"><img th:src="@{/assets/9dd8c.svg}" alt=""></span><span>Campus<span class="primary-text">Rent</span></span></a>
+    <nav aria-label="주요 메뉴"><a th:href="@{/equipment}">장비 대여</a><a th:href="@{/facilities}">시설 대여</a><a th:href="@{/purpose}">목적별 대여</a></nav>
+    <button class="login-button" type="button" data-open-account>로그인 / 회원가입</button>
+  </div>
+  <dialog id="account-dialog" aria-labelledby="account-title"><form method="dialog"><button class="close-dialog" aria-label="닫기">×</button><h2 id="account-title">계정 기능 준비 중</h2><p>현재는 화면 탐색만 가능합니다. 로그인과 신청 기능은 서버 인증 및 Oracle 연동 단계에서 제공됩니다.</p><button class="primary-button">확인</button></form></dialog>
+</header>
+<footer th:fragment="footer" class="site-footer"><div class="container"><a class="brand" th:href="@{/}">Campus<span>Rent</span></a><p>New-Era · 교내 시설·장비 대여 및 관리 시스템</p><p class="copyright">© 2026 CampusRent (New-Era). All rights reserved.</p></div></footer>
+</body>
+</html>
